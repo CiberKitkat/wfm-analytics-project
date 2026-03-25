@@ -1,64 +1,45 @@
-CREATE DATABASE wfm_db;
-USE wfm_db;
-
-CREATE TABLE agents (
-iD_agent INT PRIMARY KEY,
-nombre VARCHAR(50),
-equipo VARCHAR(50)
-);
-
-CREATE TABLE calls (
-iD_call int PRIMARY KEY,
-agent_id INT, 
-duration INT,
-date_call DATE
-);
-
-INSERT INTO agents VALUES
-(1, 'Ana', 'Soporte'),
-(2, 'Luis', 'Ventas'),
-(3, 'Carlos', 'Soporte');
-
-INSERT INTO calls VALUES
-(1, 1, 300, '2026-03-01'),
-(2, 1, 200, '2026-03-01'),
-(3, 2, 400, '2026-03-01'),
-(4, 3, 150, '2026-03-02'),
-(5, 2, 350, '2026-03-02');
-
-SELECT * FROM calls
-WHERE agent_id = 1;
-
-SELECT agent_id, COUNT(*) AS cantidad_llamadas
+#Mostrar el total de llamadas por nombre del agente
+SELECT agents.nombre, COUNT(*) AS total_calls
 FROM calls
-GROUP BY agent_id;
+JOIN agents
+ON calls.agent_id = agents.iD_agent
+GROUP BY agents.nombre;
 
-SELECT agent_id, AVG(duration) AS average
+#Promedio de duración de llamada por nombre del agente
+SELECT agents.nombre, AVG(calls.duration) AS promedio_llamada
 FROM calls
-GROUP BY agent_id;
+JOIN agents
+ON calls.agent_id = agents.iD_agent
+GROUP BY agents.nombre;
 
-# que agente tiene más llamadas?
-SELECT agent_id, COUNT(*) AS cantidad_llamadas
+#Total de llamadas por equipo
+SELECT agents.equipo, COUNT(*) AS total_calls
 FROM calls
-GROUP BY agent_id
+JOIN agents
+ON calls.agent_id = agents.iD_agent
+GROUP BY agents.equipo;
+
+#Agente con más llamadas por nombre
+SELECT agents.nombre, COUNT(*) AS cantidad_llamadas
+FROM calls
+JOIN agents
+ON calls.agent_id = agents.iD_agent
+GROUP BY agents.nombre
 ORDER BY cantidad_llamadas DESC
-LIMIT 2;
-#Respuesta: dos agentes tienen la misma cantidad de llamadas, el primero y el segundo.
+LIMIT 1;
 
-#¿Cual es la duración promedio total?
-SELECT AVG(duration) AS total_average
-FROM calls;
-#280 segundos
-
-#Cuantas llamadas hubo por día?
-SELECT date_call, COUNT(*) AS llamadas_día
+#Promedio duración por equipo
+SELECT agents.equipo, AVG(calls.duration) AS avg_calls
 FROM calls
-GROUP BY date_call;
-#El 2026/03/01 hubo 3 llamadas y el 2 hubo 2 llamadas
+JOIN agents
+ON calls.agent_id = agents.iD_agent
+GROUP BY agents.equipo;
 
-#Agente con mayor duración promedio
-SELECT agent_id, AVG(duration) AS average
+#Que equipo tiene mayor duracion?
+SELECT agents.equipo, AVG(calls.duration) AS avg_equipos
 FROM calls
-GROUP BY agent_id
-ORDER BY average DESC
+JOIN agents
+ON calls.agent_id = agents.iD_agent
+GROUP BY agents.equipo
+ORDER BY avg_equipos DESC
 LIMIT 1;
